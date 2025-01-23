@@ -18,7 +18,22 @@ load_dotenv()
 # --- Gemini API の設定 ---
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 if not GOOGLE_API_KEY:
-    st.error("環境変数 GOOGLE_API_KEY が設定されていません。.envファイルを確認してください。")
+    st.error("""
+    環境変数 GOOGLE_API_KEY が設定されていません。
+    
+    Streamlit Cloudをご利用の場合:
+    1. Streamlit Cloudのダッシュボードにアクセス
+    2. アプリの「Settings」を開く
+    3. 「Secrets」セクションで以下を追加:
+       ```
+       GOOGLE_API_KEY = "your-google-api-key-here"
+       AMBI_USERNAME = "your-ambi-username"
+       AMBI_PASSWORD = "your-ambi-password"
+       ```
+    
+    ローカル環境の場合:
+    .envファイルに必要な環境変数を設定してください。
+    """)
     st.stop()
 
 genai.configure(api_key=GOOGLE_API_KEY)
@@ -26,9 +41,16 @@ genai.configure(api_key=GOOGLE_API_KEY)
 # --- グローバル定数の設定 ---
 def init_global_constants():
     if 'AMBI_USERNAME' not in st.session_state:
-        st.session_state.AMBI_USERNAME = os.getenv("AMBI_USERNAME", "MBYXB001")
+        st.session_state.AMBI_USERNAME = os.getenv("AMBI_USERNAME", "")
     if 'AMBI_PASSWORD' not in st.session_state:
-        st.session_state.AMBI_PASSWORD = os.getenv("AMBI_PASSWORD", "$brbJ#Z7vkcwk")
+        st.session_state.AMBI_PASSWORD = os.getenv("AMBI_PASSWORD", "")
+    
+    # 環境変数が設定されていない場合の警告
+    if not st.session_state.AMBI_USERNAME or not st.session_state.AMBI_PASSWORD:
+        st.warning("""
+        AMBIのログイン情報が環境変数に設定されていません。
+        サイドバーで手動入力するか、環境変数を設定してください。
+        """)
 
 # --- サイドバーでログイン情報を入力 ---
 def sidebar_login():
